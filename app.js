@@ -24,6 +24,7 @@ app.shortcut(
         trigger_id: shortcut.trigger_id,
         view: {
           type: "modal",
+          callback_id: "hello_modal",
           title: {
             type: "plain_text",
             text: "My App",
@@ -31,6 +32,10 @@ app.shortcut(
           close: {
             type: "plain_text",
             text: "Close",
+          },
+          submit: {
+            type: "plain_text",
+            text: "Submit",
           },
           blocks: [
             {
@@ -61,6 +66,28 @@ app.shortcut(
     }
   }
 );
+
+// ref. https://slack.dev/bolt-js/ja-jp/concepts#view_submissions
+// モーダルでのデータ送信イベントを処理します
+app.view("hello_modal", async ({ ack, body, view, context }) => {
+  // モーダルでのデータ送信イベントを確認
+  await ack();
+
+  // 入力値を使ってやりたいことをここで実装
+  console.log(view.state);
+  const user = body["user"]["id"];
+
+  // ユーザーにメッセージを送信
+  try {
+    await app.client.chat.postMessage({
+      token: context.botToken,
+      channel: user,
+      text: 'Your submission was successful',
+    });
+  } catch (error) {
+    console.error(error);
+  }
+});
 
 (async () => {
   // Start your app
